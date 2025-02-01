@@ -1,0 +1,36 @@
+name: Build
+on: workflow_dispatch
+jobs:
+    build-linux-i686:
+     name: Build Linux (x64)
+     uses: ./.github/workflows/build-basilisk-linux-i686.yml
+     with:
+         GENERATE_RELEASE_FILES: true
+
+    build-linux-x64:
+        name: Build Linux (x64)
+        uses: ./.github/workflows/build-basilisk-linux-x86_64.yml
+        needs: build-linux-i686
+        with:
+         GENERATE_RELEASE_FILES: true
+
+    build-linux-aarch64:
+      name: Build Linux (aarch64)
+      uses: ./.github/workflows/build-basilisk-linux-aarch64.yml
+      needs: build-linux-x64
+      with:
+       GENERATE_RELEASE_FILES: true
+
+    build-windows:
+      name: Build Windows
+      uses: ./.github/workflows/build-basilisk-windows.yml
+      needs: build-linux-aarch64
+      with:
+       GENERATE_RELEASE_FILES: true
+
+    build-macos:
+        name: Build Windows (aarch64)
+        uses: ./.github/workflows/build-basilisk-macos.yml
+        needs: build-windows-x64
+        with:
+         GENERATE_RELEASE_FILES: true

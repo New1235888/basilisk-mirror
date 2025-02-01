@@ -2,10 +2,11 @@ name: Build Basilisk Windows
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - release
+  workflow_call:
+   inputs:
+    GENERATE_RELEASE_FILES:
+       required: true
+       type: boolean
 
 jobs:
   build-basilisk-windows:
@@ -47,19 +48,11 @@ jobs:
         run: Copy-Item .github\workflows\build-basilisk-windows\mozconfig-${{ matrix.config.win }} -Destination .\.mozconfig
         shell: pwsh
 
-      - name: Update mozconfig for release branch
-        if: github.ref == 'refs/heads/release'
+      - name: Update mozconfig if generating release files is true
+        if: ${{ inputs.GENERATE_RELEASE_FILES == true}}
         shell: pwsh
         run: |
             (Get-Content .\.mozconfig) -replace 'disable-updater', 'enable-updater' | Set-Content .\.mozconfig
-            (Get-Content .\.mozconfig) -replace 'disable-official-branding', 'enable-official-branding' | Set-Content .\.mozconfig
-
-      - name: Pull official branding files for release branch
-        if: github.ref == 'refs/heads/release'
-        run: |
-          cd basilisk/branding
-          git clone https://${{ secrets.RPMO_CLONE_CREDENTIALS }}@repo.palemoon.org/Basilisk-Dev/${{ secrets.OFFICIAL_BRANDING_REPO_NAME }}.git official
-        shell: pwsh
 
       - name: mach configure
         run: |
@@ -76,14 +69,14 @@ jobs:
           C:\mozilla-build\start-shell.bat /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }}/.github/workflows/build-basilisk-windows/mach-passthrough-windows.sh /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }} package
         shell: pwsh
 
-      - name: mach installer if release branch
-        if: github.ref == 'refs/heads/release'
+      - name: mach installer if generating release files is true
+        if: ${{ inputs.GENERATE_RELEASE_FILES == true}}
         shell: pwsh
         run: |
           C:\mozilla-build\start-shell.bat /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }}/.github/workflows/build-basilisk-windows/mach-passthrough-windows.sh /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }} installer
 
-      - name: mach mar if release branch
-        if: github.ref == 'refs/heads/release'
+      - name: mach mar if generating release files is true
+        if:  ${{ inputs.GENERATE_RELEASE_FILES == true}}
         shell: pwsh
         run: |
           C:\mozilla-build\start-shell.bat /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }}/.github/workflows/build-basilisk-windows/mach-passthrough-windows.sh /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }} mar

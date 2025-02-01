@@ -2,10 +2,11 @@ name: Build Basilisk MacOS
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - release
+  workflow_call:
+   inputs:
+    GENERATE_RELEASE_FILES:
+       required: true
+       type: boolean
 
 jobs:
   build-basilisk:
