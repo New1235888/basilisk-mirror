@@ -7,6 +7,9 @@ on:
     GENERATE_RELEASE_FILES:
        required: true
        type: boolean
+    UPLOAD_FILES:
+        required: true
+        type: boolean 
 
 jobs:
   build-basilisk-windows:
@@ -14,6 +17,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         config:
         - name: Windows-Win64
@@ -82,6 +86,7 @@ jobs:
           C:\mozilla-build\start-shell.bat /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }}/.github/workflows/build-basilisk-windows/mach-passthrough-windows.sh /d/a/${{ github.event.repository.name }}/${{ github.event.repository.name }} mar
 
       - uses: actions/upload-artifact@v4
+        if: ${{ inputs.UPLOAD_FILES == true}}
         with:
           name: basilisk-windows-${{ matrix.config.win }}
           path: obj-${{ matrix.config.arch }}-pc-mingw32/dist/basilisk-*

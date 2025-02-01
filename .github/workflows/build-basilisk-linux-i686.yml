@@ -7,6 +7,9 @@ on:
     GENERATE_RELEASE_FILES:
      required: true
      type: boolean
+    UPLOAD_FILES:
+     required: true
+     type: boolean
 
 jobs:
   build-basilisk:
@@ -14,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         config:
           - name: GTK3 i686
@@ -59,6 +63,7 @@ jobs:
         run: ./build-scripts/linux/build_basilisk.sh
 
       - uses: actions/upload-artifact@v4
+        if: ${{ inputs.UPLOAD_FILES == true}}
         with:
           name: basilisk-linux-${{ matrix.config.arch }}-${{ matrix.config.gtk }}
           path: obj-${{ matrix.config.arch }}-unknown-linux-gnu/dist/basilisk-*
