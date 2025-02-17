@@ -14,7 +14,7 @@ on:
 jobs:
   build-basilisk:
     name: Build Basilisk Linux ${{ matrix.config.name }}
-    runs-on: ubuntu-24.04-arm64
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       max-parallel: 1
